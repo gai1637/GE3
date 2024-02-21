@@ -13,7 +13,23 @@ public:
 	void Initialize(HINSTANCE hInstance,HWND hwnd);
 	//更新
 	void Update();
+/// <summary>
+/// キーの押下をチェック
+/// </summary>
+/// <param name="keyNumber">キー番号(DIK_0等)</param>
+/// <returns>押されているか</returns>
+	bool PushKey(BYTE keyNumber);
+	/// <summary>
+/// キーのトリガーをチェック
+/// </summary>
+/// <param name="keyNumber">キー番号(DIK_0等)</param>
+/// <returns>トリガーか</returns>
+	bool TriggerKey(BYTE keyNumber);
+
 private:
 	ComPtr<IDirectInputDevice8> keyboard;
+	BYTE key[256] = {};
+	BYTE keyPre[256] = {};
+	ComPtr<IDirectInput8> directInput;
 };
 
