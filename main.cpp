@@ -941,7 +941,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     device->CreateShaderResourceView(texBuff2.Get(), &srvDesc, srvHandle);
 
     size_t textureIndex = 0;
-    BYTE key[256] = {};
+    
 
     // ゲームループ
     while (true) {
@@ -956,10 +956,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             break;
         }
 
-        // キーボード情報の取得開始
-        keyboard->Acquire();
-        // 全キーの入力状態を取得する
-        keyboard->GetDeviceState(sizeof(key), key);
+        input->Update();
 
         //// 数字の0キーが押されていたら
         //if (key[DIK_0]) 
@@ -976,26 +973,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //    constMapMaterial->color = XMFLOAT4(red, 1.0f - red, 0, 0.5f);              // RGBAで半透明の赤
         //}
 
-        if (key[DIK_D] || key[DIK_A])
-        {
-            if (key[DIK_D]) { angle += XMConvertToRadians(1.0f); }
-            else if (key[DIK_A]) { angle -= XMConvertToRadians(1.0f); }
+        //if (key[DIK_D] || key[DIK_A])
+        //{
+        //    if (key[DIK_D]) { angle += XMConvertToRadians(1.0f); }
+        //    else if (key[DIK_A]) { angle -= XMConvertToRadians(1.0f); }
 
-            // angleラジアンだけY軸まわりに回転。半径は-100
-            eye.x = -100 * sinf(angle);
-            eye.z = -100 * cosf(angle);
+        //    // angleラジアンだけY軸まわりに回転。半径は-100
+        //    eye.x = -100 * sinf(angle);
+        //    eye.z = -100 * cosf(angle);
 
-            matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
-        }
+        //    matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+        //}
 
-        // 座標操作
-        if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT])
-        {
-            if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; }
-            else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
-            if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; }
-            else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
-        }
+        //// 座標操作
+        //if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT])
+        //{
+        //    if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; }
+        //    else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
+        //    if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; }
+        //    else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
+        //}
 
         // 全オブジェクトについて処理
         for (size_t i = 0; i < _countof(object3ds); i++)
