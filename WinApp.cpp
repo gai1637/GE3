@@ -4,7 +4,7 @@
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
-#include<stdint.h>
+
 extern IMGUI_IMPL_API LRESULT Imgui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -27,28 +27,26 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 void WinApp::Initialize()
 {
-	 // ウィンドウクラスの設定
-    WNDCLASSEX w{};
-    w.cbSize = sizeof(WNDCLASSEX);
-    w.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
-    w.lpszClassName = L"DirectXGame"; // ウィンドウクラス名
-    w.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
-    w.hCursor = LoadCursor(NULL, IDC_ARROW); // カーソル指定
+    HRESULT result = CoInitializeEx(0, COINITBASE_MULTITHREADED);
+	 
+   
+    wc.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
+    wc.lpszClassName = L"DirectXGame"; // ウィンドウクラス名
+    wc.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // カーソル指定
 
     // ウィンドウクラスをOSに登録する
-    RegisterClassEx(&w);
+    RegisterClass(&wc);
 
-    // ウィンドウサイズ
-    const int32_t window_height = 720;  // 縦幅
-    const int32_t window_width = 1280;  // 横幅
-
+   
      // ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
     RECT wrc = { 0, 0, window_width, window_height };
     // 自動でサイズを補正する
     AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
      // ウィンドウオブジェクトの生成
-    HWND hwnd = CreateWindow(w.lpszClassName, // クラス名
+    hwnd = CreateWindow(
+        wc.lpszClassName, // クラス名
         L"DirectXGame",         // タイトルバーの文字
         WS_OVERLAPPEDWINDOW,        // 標準的なウィンドウスタイル
         CW_USEDEFAULT,              // 表示X座標（OSに任せる）
@@ -57,7 +55,7 @@ void WinApp::Initialize()
         wrc.bottom - wrc.top,   // ウィンドウ縦幅
         nullptr,                // 親ウィンドウハンドル
         nullptr,                // メニューハンドル
-        w.hInstance,            // 呼び出しアプリケーションハンドル
+        wc.hInstance,            // 呼び出しアプリケーションハンドル
         nullptr);               // オプション
 
     // ウィンドウを表示状態にする
