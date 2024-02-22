@@ -6,6 +6,7 @@
 
 
 
+
 void DirectXCommon::Initialize(WinApp* winApp)
 {
     assert(winApp);
@@ -101,6 +102,68 @@ void DirectXCommon::PostDraw()
         result = commandList->Reset(commandAllocator.Get(), nullptr);
         assert(SUCCEEDED(result));
 
+}
+
+//ComPtr<IDxcBlob> DirectXCommon::CompilShader(const std::wstring& filePath, const wchar_t* profile)
+//{
+//    IDxcBlobEncoding* shaderSource = nullptr;
+//    HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+//    assert(SUCCEEDED(hr));
+//    DxcBuffer shaderSourceBuffer;
+//    shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+//    shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+//    shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+//    LPCWSTR arguments[] = {
+//        filePath.c_str(),
+//        L"-E",L"main",
+//        L"-T",profile,
+//        L"-zi",L"-Qembed_debug",
+//        L"-Od",
+//        L"-Zpr",
+//
+//    };
+//    IDxcResult* shaderResult = nullptr;
+//    hr = dxcCompiler->Compile(
+//        &shaderSourceBuffer,
+//        arguments,
+//        _countof(arguments),
+//        includeHandler,
+//        IID_PPV_ARGS(&shaderResult)
+//    );
+//    assert(SUCCEEDED(hr));
+//
+//    return ComPtr<IDxcBlob>();
+//}
+
+ComPtr<ID3D12Resource> DirectXCommon::CreateTexture(const DirectX::TexMetadata& metadata)
+{
+    // ヒープ設定
+    D3D12_HEAP_PROPERTIES textureHeapProp{};
+    textureHeapProp.Type = D3D12_HEAP_TYPE_CUSTOM;
+    textureHeapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+    textureHeapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+    // リソース設定
+    D3D12_RESOURCE_DESC textureResourceDesc{};
+    textureResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    textureResourceDesc.Format = metadata.format;
+    textureResourceDesc.Width = metadata.width;
+    textureResourceDesc.Height = (UINT)metadata.height;
+    textureResourceDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
+    textureResourceDesc.MipLevels = (UINT16)metadata.mipLevels;
+    textureResourceDesc.SampleDesc.Count = 1;
+    // テクスチャバッファの生成
+    ComPtr<ID3D12Resource> texBuff;
+    HRESULT result = device->CreateCommittedResource(
+        &textureHeapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &textureResourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
+        nullptr,
+        IID_PPV_ARGS(&texBuff));
+    if (result == S_OK) {
+        return texBuff;
+    }
+    return nullptr;
 }
 
 void DirectXCommon::DeviceInitialize()

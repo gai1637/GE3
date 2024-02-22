@@ -5,6 +5,10 @@
 #include<vector>
 #include<chrono>
 #include"WinApp.h"
+#include<dxcapi.h>
+#pragma comment(lib,"dxcompiler.lib")
+#include<string>
+#include <DirectXTex.h>
 using namespace Microsoft::WRL;
 class DirectXCommon
 {
@@ -19,7 +23,13 @@ public:
 	ID3D12Device*GetDevice()const { return device.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
 
-    
+   /* ComPtr<IDxcBlob> CompilShader(
+        const std::wstring& filePath,
+        const wchar_t* profile
+    );*/
+
+    ComPtr<ID3D12Resource> CreateTexture(const DirectX::TexMetadata& metadata);
+
 private:
     //デバイス
 	void DeviceInitialize();
