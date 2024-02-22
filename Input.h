@@ -3,14 +3,14 @@
 #include<wrl.h>
 #define DIRECTION_VERSION 0x0800
 #include<dinput.h>
-
+#include"WinApp.h"
 
 class Input
 {
 public:
 	template <class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 	//初期化
-	void Initialize(HINSTANCE hInstance,HWND hwnd);
+	void Initialize(WinApp* winApp);
 	//更新
 	void Update();
 /// <summary>
@@ -31,5 +31,7 @@ private:
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
 	ComPtr<IDirectInput8> directInput;
+	//WindowsAPI
+	WinApp* winApp_ = nullptr;
 };
 

@@ -67,3 +67,9 @@ void WinApp::Draw()
 {
 
 }
+
+void WinApp::Finalize()
+{
+    CloseWindow(hwnd);
+    CoUninitialize();
+}
