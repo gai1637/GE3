@@ -1,4 +1,4 @@
-#include "WinApp.h"
+ï»¿#include "WinApp.h"
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 #include"externals/imgui/imgui.h"
@@ -11,16 +11,16 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
     if (Imgui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
         return true;
     }
-    // ƒƒbƒZ[ƒW‰‚¶‚ÄƒQ[ƒ€ŒÅ—L‚Ìˆ—‚ğs‚¤
+    // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å¿œã˜ã¦ã‚²ãƒ¼ãƒ å›ºæœ‰ã®å‡¦ç†ã‚’è¡Œã†
     switch (msg) {
-        // ƒEƒBƒ“ƒhƒE‚ª”jŠü‚³‚ê‚½
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç ´æ£„ã•ã‚ŒãŸ
     case WM_DESTROY:
-        // OS‚É‘Î‚µ‚ÄAƒAƒvƒŠ‚ÌI—¹‚ğ“`‚¦‚é
+        // OSã«å¯¾ã—ã¦ã€ã‚¢ãƒ—ãƒªã®çµ‚äº†ã‚’ä¼ãˆã‚‹
         PostQuitMessage(0);
         return 0;
     }
 
-    // •W€‚ÌƒƒbƒZ[ƒWˆ—‚ğs‚¤
+    // æ¨™æº–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã‚’è¡Œã†
     return DefWindowProc(hwnd, msg, wparam, lparam);
 
 }
@@ -30,35 +30,35 @@ void WinApp::Initialize()
     HRESULT result = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 	 
    
-    wc.lpfnWndProc = (WNDPROC)WindowProc; // ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ‚ğİ’è
-    wc.lpszClassName = L"DirectXGame"; // ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX–¼
-    wc.hInstance = GetModuleHandle(nullptr); // ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // ƒJ[ƒ\ƒ‹w’è
+    wc.lpfnWndProc = WindowProc; // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã‚’è¨­å®š
+    wc.lpszClassName = L"DirectXGame"; // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹å
+    wc.hInstance = GetModuleHandle(nullptr); // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW); // ã‚«ãƒ¼ã‚½ãƒ«æŒ‡å®š
 
-    // ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚ğOS‚É“o˜^‚·‚é
+    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã‚’OSã«ç™»éŒ²ã™ã‚‹
     RegisterClass(&wc);
 
    
-     // ƒEƒBƒ“ƒhƒEƒTƒCƒY{ XÀ•W YÀ•W ‰¡• c• }
+     // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚º{ Xåº§æ¨™ Yåº§æ¨™ æ¨ªå¹… ç¸¦å¹… }
     RECT wrc = { 0, 0, window_width, window_height };
-    // ©“®‚ÅƒTƒCƒY‚ğ•â³‚·‚é
+    // è‡ªå‹•ã§ã‚µã‚¤ã‚ºã‚’è£œæ­£ã™ã‚‹
     AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-     // ƒEƒBƒ“ƒhƒEƒIƒuƒWƒFƒNƒg‚Ì¶¬
+     // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”Ÿæˆ
     hwnd = CreateWindow(
-        wc.lpszClassName, // ƒNƒ‰ƒX–¼
-        L"DirectXGame",         // ƒ^ƒCƒgƒ‹ƒo[‚Ì•¶š
-        WS_OVERLAPPEDWINDOW,        // •W€“I‚ÈƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹
-        CW_USEDEFAULT,              // •\¦XÀ•WiOS‚É”C‚¹‚éj
-        CW_USEDEFAULT,              // •\¦YÀ•WiOS‚É”C‚¹‚éj
-        wrc.right - wrc.left,       // ƒEƒBƒ“ƒhƒE‰¡•
-        wrc.bottom - wrc.top,   // ƒEƒBƒ“ƒhƒEc•
-        nullptr,                // eƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-        nullptr,                // ƒƒjƒ…[ƒnƒ“ƒhƒ‹
-        wc.hInstance,            // ŒÄ‚Ño‚µƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒnƒ“ƒhƒ‹
-        nullptr);               // ƒIƒvƒVƒ‡ƒ“
+        wc.lpszClassName, // ã‚¯ãƒ©ã‚¹å
+        L"DirectXGame",         // ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã®æ–‡å­—
+        WS_OVERLAPPEDWINDOW,        // æ¨™æº–çš„ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«
+        CW_USEDEFAULT,              // è¡¨ç¤ºXåº§æ¨™ï¼ˆOSã«ä»»ã›ã‚‹ï¼‰
+        CW_USEDEFAULT,              // è¡¨ç¤ºYåº§æ¨™ï¼ˆOSã«ä»»ã›ã‚‹ï¼‰
+        wrc.right - wrc.left,       // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æ¨ªå¹…
+        wrc.bottom - wrc.top,   // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç¸¦å¹…
+        nullptr,                // è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+        nullptr,                // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ³ãƒ‰ãƒ«
+        wc.hInstance,            // å‘¼ã³å‡ºã—ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãƒãƒ³ãƒ‰ãƒ«
+        nullptr);               // ã‚ªãƒ—ã‚·ãƒ§ãƒ³
 
-    // ƒEƒBƒ“ƒhƒE‚ğ•\¦ó‘Ô‚É‚·‚é
+    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¡¨ç¤ºçŠ¶æ…‹ã«ã™ã‚‹
     ShowWindow(hwnd, SW_SHOW);
 
 }
@@ -72,4 +72,21 @@ void WinApp::Finalize()
 {
     CloseWindow(hwnd);
     CoUninitialize();
+}
+
+bool WinApp::ProcessMessage()
+{
+    MSG msg{}; 
+     // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã‚ã‚‹ï¼Ÿ
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg); // ã‚­ãƒ¼å…¥åŠ›ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡¦ç†
+            DispatchMessage(&msg); // ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚‹
+        }
+
+        // âœ–ãƒœã‚¿ãƒ³ã§çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒæ¥ãŸã‚‰ã‚²ãƒ¼ãƒ ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹
+        if (msg.message == WM_QUIT) {
+            return true;
+        }
+
+    return false;
 }
