@@ -5,12 +5,12 @@
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 
-//extern IMGUI_IMPL_API LRESULT Imgui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-    /*if (Imgui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
         return true;
-    }*/
+    }
     // メッセージ応じてゲーム固有の処理を行う
     switch (msg) {
         // ウィンドウが破棄された

@@ -3,6 +3,8 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 #include<d3d12.h>
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
 
 
 
@@ -65,6 +67,8 @@ void DirectXCommon::PreDraw()
         scissorRect.bottom = scissorRect.top + WinApp::window_height;       // 切り抜き座標下
         // シザー矩形設定コマンドを、コマンドリストに積む
         commandList->RSSetScissorRects(1, &scissorRect);
+
+
 }
 
 void DirectXCommon::PostDraw()
