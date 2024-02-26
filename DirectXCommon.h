@@ -9,7 +9,13 @@
 #pragma comment(lib,"dxcompiler.lib")
 #include<string>
 #include <DirectXTex.h>
+#include<memory>
+#include<chrono>
 using namespace Microsoft::WRL;
+HRESULT Present(
+UINT SyncInterval,
+UINT flags
+);
 class DirectXCommon
 {
 public:
@@ -20,8 +26,17 @@ public:
 	//描画後処理
 	void PostDraw();
 
+    void ImGuiUpdate();
+
+    void EndImGui();
+
 	ID3D12Device*GetDevice()const { return device.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
+    //FPS固定初期化
+    void InitializeFixFPS();
+    //FPS固定更新
+    void UpdateFixFPS();
+
 
    /* ComPtr<IDxcBlob> CompilShader(
         const std::wstring& filePath,
@@ -29,7 +44,9 @@ public:
     );*/
 
     ComPtr<ID3D12Resource> CreateTexture(const DirectX::TexMetadata& metadata);
-
+    ID3D12DescriptorHeap* CreateDescriptorHeap(
+    ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+    
 private:
     //デバイス
 	void DeviceInitialize();
@@ -43,6 +60,8 @@ private:
 	void RenderTargetInitialize();
     //フェンス
 	void FenceInitialize();
+    //ImGui
+    void ImGuiInitialize();
 private:
      // デスクリプタヒープの設定
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc{};
@@ -57,6 +76,10 @@ private:
     UINT64 fenceVal = 0;
     // リソース生成
     ComPtr<ID3D12Resource> depthBuff;
+    // レンダーターゲットビューの設定
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+
+    ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
 
     ComPtr<ID3D12Device> device;
     ComPtr<IDXGIFactory7> dxgiFactory;
@@ -69,5 +92,6 @@ private:
 
    
     WinApp* winApp_ = nullptr;
+    std::chrono::steady_clock::time_point reference_;
 };
 

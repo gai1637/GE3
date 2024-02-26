@@ -5,20 +5,26 @@
 #include<d3d12.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-
-
+#include"externals/imgui/imgui.h"
+#include"externals/imgui/imgui_impl_dx12.h"
+#include"externals/imgui/imgui_impl_win32.h"
+#include<thread>
 
 
 void DirectXCommon::Initialize(WinApp* winApp)
 {
     assert(winApp);
-    this->winApp_ = winApp;
+    winApp_ = winApp;
+    InitializeFixFPS();
     DeviceInitialize();
     CommandInitialize();
     SwapChainInitialize();
     RenderTargetInitialize();
     DepthBufferInitialize();
+    
     FenceInitialize();
+   /* srvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+    ImGuiInitialize();*/
 
 }
 
@@ -99,6 +105,8 @@ void DirectXCommon::PostDraw()
             CloseHandle(event);
         }
 
+        UpdateFixFPS();
+
         // キューをクリア
         result = commandAllocator->Reset();
         assert(SUCCEEDED(result));
@@ -106,6 +114,42 @@ void DirectXCommon::PostDraw()
         result = commandList->Reset(commandAllocator.Get(), nullptr);
         assert(SUCCEEDED(result));
 
+}
+
+void DirectXCommon::ImGuiUpdate()
+{
+    ImGui_ImplDX12_NewFrame();
+    ImGui::ShowDemoWindow();
+    ImGui::Render();
+    ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap };
+    commandList->SetDescriptorHeaps(1,descriptorHeaps->GetAddressOf());
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+}
+
+void DirectXCommon::EndImGui()
+{
+    ImGui::DestroyContext();
+}
+
+void DirectXCommon::InitializeFixFPS()
+{
+    reference_ = std::chrono::steady_clock::now();
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
+    const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+    const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::microseconds elapsed =
+        std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+    if (elapsed < kMinCheckTime) {
+        while (std::chrono::steady_clock::now()-reference_<kMinTime)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
+        }
+    }
+    reference_ = std::chrono::steady_clock::now();
 }
 
 //ComPtr<IDxcBlob> DirectXCommon::CompilShader(const std::wstring& filePath, const wchar_t* profile)
@@ -169,6 +213,20 @@ ComPtr<ID3D12Resource> DirectXCommon::CreateTexture(const DirectX::TexMetadata& 
     }
     return nullptr;
 }
+
+ID3D12DescriptorHeap* DirectXCommon::CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
+{
+    ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+    D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+    descriptorHeapDesc.Type = heapType;
+    descriptorHeapDesc.NumDescriptors = numDescriptors;
+    descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    HRESULT hr= device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+    assert(SUCCEEDED(hr));
+    return descriptorHeap.Get();
+}
+
+
 
 void DirectXCommon::DeviceInitialize()
 {
@@ -371,8 +429,7 @@ void DirectXCommon::RenderTargetInitialize()
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
         // 裏か表かでアドレスがずれる
         rtvHandle.ptr += i * device->GetDescriptorHandleIncrementSize(rtvHeapDesc.Type);
-        // レンダーターゲットビューの設定
-        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+        
         // シェーダーの計算結果をSRGBに変換して書き込む
         rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -391,4 +448,22 @@ void DirectXCommon::FenceInitialize()
     result = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
     assert(SUCCEEDED(result));
 
+}
+
+void DirectXCommon::ImGuiInitialize()
+{
+    
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplWin32_Init(winApp_->GetHwnd());
+    ImGui_ImplDX12_Init(
+        device.Get(),
+        swapChainDesc.BufferCount,
+        rtvDesc.Format,
+        srvDescriptorHeap.Get(),
+        srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+        srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+
+    );
 }

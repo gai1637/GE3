@@ -20,6 +20,8 @@ public:
 	HINSTANCE GetHinstance()const { return wc.hInstance; }
 	void Finalize();
 	bool ProcessMessage();
+	
+	HWND GetHwnd() { return hwnd; }
 private:
 	// ウィンドウオブジェクトの生成
 	HWND hwnd = nullptr;

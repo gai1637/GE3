@@ -13,6 +13,7 @@
 #include"Input.h"
 #include"WinApp.h"
 #include"DirectXCommon.h"
+#include"D3DResourceLeakChecker.h"
 
 
 #pragma comment(lib, "d3dcompiler.lib")
@@ -686,6 +687,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     while (true) {
        
         if (winApp->ProcessMessage()) {
+            /*dxCommon->EndImGui();*/
             break;
         }
 
@@ -705,6 +707,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //    red = max(0, red);
         //    constMapMaterial->color = XMFLOAT4(red, 1.0f - red, 0, 0.5f);              // RGBAで半透明の赤
         //}
+
+        
+
 
         if (input->PushKey(DIK_D) || input->PushKey(DIK_A))
         {
@@ -732,7 +737,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {
             UpdateObject3d(&object3ds[i], matView, matProjection);
         }
-
+        /*dxCommon->ImGuiUpdate();*/
         dxCommon->PreDraw();
         // プリミティブ形状の設定コマンド
         dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 三角形リスト
