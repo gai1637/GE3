@@ -55,6 +55,8 @@ private:
     // フェンスの生成
     ComPtr<ID3D12Fence> fence;
     UINT64 fenceVal = 0;
+    // リソース生成
+    ComPtr<ID3D12Resource> depthBuff;
 
     ComPtr<ID3D12Device> device;
     ComPtr<IDXGIFactory7> dxgiFactory;

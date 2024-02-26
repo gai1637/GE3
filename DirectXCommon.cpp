@@ -326,8 +326,7 @@ void DirectXCommon::DepthBufferInitialize()
     D3D12_CLEAR_VALUE depthClearValue{};
     depthClearValue.DepthStencil.Depth = 1.0f; // 深度値1.0f（最大値）でクリア
     depthClearValue.Format = DXGI_FORMAT_D32_FLOAT; // 深度値フォーマット
-    // リソース生成
-    ComPtr<ID3D12Resource> depthBuff;
+    
     result = device->CreateCommittedResource(
         &depthHeapProp,
         D3D12_HEAP_FLAG_NONE,
