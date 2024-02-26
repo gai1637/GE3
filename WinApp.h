@@ -4,6 +4,7 @@
 #define DIRECTION_VERSION 0x0800
 #include<dinput.h>
 #include<stdint.h>
+#include"DirectXCommon.h"
 class WinApp
 {
 public:
@@ -22,10 +23,12 @@ public:
 	bool ProcessMessage();
 	
 	HWND GetHwnd() { return hwnd; }
+	~WinApp();
 private:
 	// ウィンドウオブジェクトの生成
 	HWND hwnd = nullptr;
 	// ウィンドウクラスの設定
     WNDCLASS wc{};
+
 };
 

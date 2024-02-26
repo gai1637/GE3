@@ -162,6 +162,8 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteCommon.cpp" />
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +205,8 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteCommon.h" />
     <ClInclude Include="WinApp.h" />
   </ItemGroup>
   <ItemGroup>

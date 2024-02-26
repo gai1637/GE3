@@ -5,6 +5,8 @@
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 #pragma comment(lib,"winmm.lib")
+#include"Sprite.h"
+#include"SpriteCommon.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -28,7 +30,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 void WinApp::Initialize()
 {
-    timeBeginPeriod(1);
+    
     HRESULT result = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 	 
    
@@ -40,7 +42,8 @@ void WinApp::Initialize()
     // ウィンドウクラスをOSに登録する
     RegisterClass(&wc);
 
-   
+    
+
      // ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
     RECT wrc = { 0, 0, window_width, window_height };
     // 自動でサイズを補正する
@@ -60,11 +63,12 @@ void WinApp::Initialize()
         wc.hInstance,            // 呼び出しアプリケーションハンドル
         nullptr);               // オプション
 
+   
     // ウィンドウを表示状態にする
     ShowWindow(hwnd, SW_SHOW);
 
-   
-
+    
+    timeBeginPeriod(1);
 }
 
 void WinApp::Draw()
@@ -93,6 +97,11 @@ bool WinApp::ProcessMessage()
         }
 
     return false;
+}
+
+WinApp::~WinApp()
+{
+    
 }
 
 

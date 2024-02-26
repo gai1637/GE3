@@ -12,10 +12,6 @@
 #include<memory>
 #include<chrono>
 using namespace Microsoft::WRL;
-HRESULT Present(
-UINT SyncInterval,
-UINT flags
-);
 class DirectXCommon
 {
 public:
