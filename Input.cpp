@@ -1,56 +1,57 @@
 #include "Input.h"
-#include"assert.h"
-#pragma comment(lib,"dinput8.lib")
-#pragma comment(lib,"dxguid.lib")
+#include<cassert>
+using namespace Microsoft::WRL;
 
 
-
-
-
-void Input::Initialize(WinApp* winApp)
+void Input::Initialize(WinApp*winApp)
 {
-    this->winApp_ = winApp;
-	 HRESULT result;
-	 // DirectInput�̏�����
-    
+    winApp_ = winApp;
+
+    HRESULT result;
+    // DirectInputの初期化
     result = DirectInput8Create(
-        winApp->GetHinstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+        winApp_->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
     assert(SUCCEEDED(result));
 
-    // �L�[�{�[�h�f�o�C�X�̐���
+    // キーボードデバイスの生成
     
     result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-    // ���̓f�[�^�`���̃Z�b�g
-    result = keyboard->SetDataFormat(&c_dfDIKeyboard); // �W���`��
+    // 入力データ形式のセット
+    result = keyboard->SetDataFormat(&c_dfDIKeyboard); // 標準形式
     assert(SUCCEEDED(result));
-    // �r�����䃌�x���̃Z�b�g
+    // 排他制御レベルのセット
     result = keyboard->SetCooperativeLevel(
-        winApp->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+       winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
     assert(SUCCEEDED(result));
 }
 
 void Input::Update()
 {
+   //keyPreの中にkeyの情報をコピーする
     memcpy(keyPre, key, sizeof(key));
-     // �L�[�{�[�h���̎擾�J�n
-        keyboard->Acquire();   
-     // �S�L�[�̓��͏�Ԃ��擾����
-        keyboard->GetDeviceState(sizeof(key), key);
 
+   // キーボード情報の取得開始
+    keyboard->Acquire();
+    // 全キーの入力状態を取得する
+    keyboard->GetDeviceState(sizeof(key), key);
 }
 
 bool Input::PushKey(BYTE keyNumber)
 {
+    //任意のボタンが押されているか
     if (key[keyNumber]) {
         return true;
     }
+    //任意のボタンが押されていなかったとき
     return false;
 }
 
 bool Input::TriggerKey(BYTE keyNumber)
 {
-    if (!keyPre[keyNumber]&&key[keyNumber]) {
+    //任意のボタンが押されているか
+    if (key[keyNumber] && keyPre[keyNumber]==0) {
         return true;
     }
+    //任意のボタンが押されていなかったとき
     return false;
 }

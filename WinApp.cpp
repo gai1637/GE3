@@ -1,19 +1,15 @@
 ﻿#include "WinApp.h"
-#pragma comment(lib,"dinput8.lib")
-#pragma comment(lib,"dxguid.lib")
-#include"externals/imgui/imgui.h"
-#include"externals/imgui/imgui_impl_dx12.h"
-#include"externals/imgui/imgui_impl_win32.h"
-#pragma comment(lib,"winmm.lib")
-#include"Sprite.h"
-#include"SpriteCommon.h"
+#include"External/imgui/imgui.h"
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// ウィンドウプロシージャ
+LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+    
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
         return true;
     }
+    
     // メッセージ応じてゲーム固有の処理を行う
     switch (msg) {
         // ウィンドウが破棄された
@@ -25,33 +21,28 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
     // 標準のメッセージ処理を行う
     return DefWindowProc(hwnd, msg, wparam, lparam);
-
 }
-
 void WinApp::Initialize()
 {
-    
-    HRESULT result = CoInitializeEx(0, COINITBASE_MULTITHREADED);
-	 
-   
-    wc.lpfnWndProc = WindowProc; // ウィンドウプロシージャを設定
-    wc.lpszClassName = L"DirectXGame"; // ウィンドウクラス名
-    wc.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW); // カーソル指定
+
+    CoInitializeEx(0, COINIT_MULTITHREADED);
+
+    // ウィンドウクラスの設定
+    w.cbSize = sizeof(WNDCLASSEX);
+    w.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
+    w.lpszClassName = L"DirectXGame"; // ウィンドウクラス名
+    w.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
+    w.hCursor = LoadCursor(NULL, IDC_ARROW); // カーソル指定
 
     // ウィンドウクラスをOSに登録する
-    RegisterClass(&wc);
-
-    
-
-     // ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
+    RegisterClassEx(&w);
+    // ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
     RECT wrc = { 0, 0, window_width, window_height };
     // 自動でサイズを補正する
     AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-     // ウィンドウオブジェクトの生成
-    hwnd = CreateWindow(
-        wc.lpszClassName, // クラス名
+    // ウィンドウオブジェクトの生成
+   hwnd = CreateWindow(w.lpszClassName, // クラス名
         L"DirectXGame",         // タイトルバーの文字
         WS_OVERLAPPEDWINDOW,        // 標準的なウィンドウスタイル
         CW_USEDEFAULT,              // 表示X座標（OSに任せる）
@@ -60,32 +51,18 @@ void WinApp::Initialize()
         wrc.bottom - wrc.top,   // ウィンドウ縦幅
         nullptr,                // 親ウィンドウハンドル
         nullptr,                // メニューハンドル
-        wc.hInstance,            // 呼び出しアプリケーションハンドル
+        w.hInstance,            // 呼び出しアプリケーションハンドル
         nullptr);               // オプション
 
-   
     // ウィンドウを表示状態にする
     ShowWindow(hwnd, SW_SHOW);
 
-    
-    timeBeginPeriod(1);
 }
 
-void WinApp::Draw()
+bool WinApp::Update()
 {
-
-}
-
-void WinApp::Finalize()
-{
-    CloseWindow(hwnd);
-    CoUninitialize();
-}
-
-bool WinApp::ProcessMessage()
-{
-    MSG msg{}; 
-     // メッセージがある？
+    MSG msg{};
+      // メッセージがある？
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg); // キー入力メッセージの処理
             DispatchMessage(&msg); // プロシージャにメッセージを送る
@@ -96,12 +73,15 @@ bool WinApp::ProcessMessage()
             return true;
         }
 
-    return false;
+        return false;
 }
 
-WinApp::~WinApp()
+
+void WinApp::Finalize()
 {
-    
-}
+    CoUninitialize();
 
+     // ウィンドウクラスを登録解除
+    UnregisterClass(w.lpszClassName, w.hInstance);
+}
 

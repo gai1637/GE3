@@ -1,34 +1,27 @@
-﻿#pragma once
+#pragma once
 #include<Windows.h>
-#include<wrl.h>
-#define DIRECTION_VERSION 0x0800
-#include<dinput.h>
-#include<stdint.h>
-#include"DirectXCommon.h"
 class WinApp
 {
 public:
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-	 // ウィンドウサイズ
-    static const int32_t window_height = 720;  // 縦幅
-    static const int32_t window_width = 1280;  // 横幅
+	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+	//初期化
+	void Initialize();
+	//更新
+	bool Update();
+
+	void Finalize();
+	//Getter
+	HWND GetHwnd()const { return hwnd; }
+	HINSTANCE GetHInstance()const { return w.hInstance; }
 
 public:
-	void Initialize();
-	void Draw();
-	//getter
-	HWND GetHwnd()const { return hwnd; }
-	HINSTANCE GetHinstance()const { return wc.hInstance; }
-	void Finalize();
-	bool ProcessMessage();
+	 // ウィンドウサイズ
+    static const int window_width = 1280;  // 横幅
+    static const int window_height = 720;  // 縦幅
 	
-	HWND GetHwnd() { return hwnd; }
-	~WinApp();
 private:
-	// ウィンドウオブジェクトの生成
-	HWND hwnd = nullptr;
-	// ウィンドウクラスの設定
-    WNDCLASS wc{};
-
+	HWND hwnd;
+	WNDCLASSEX w{};
 };
 

@@ -1,37 +1,34 @@
-﻿#pragma once
+#pragma once
 #include<Windows.h>
-#include<wrl.h>
-#define DIRECTION_VERSION 0x0800
-#include<dinput.h>
+#include <dinput.h>
+#define DIRECTINPUT_VERSION    0x0800
+#pragma comment(lib,"dinput8.lib")
+#pragma comment(lib,"dxguid.lib")
+#include <wrl.h>
 #include"WinApp.h"
+//using namespace Microsoft::WRL;
+
 
 class Input
 {
-public:
-	template <class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
+public://メンバ変数
 	//初期化
-	void Initialize(WinApp* winApp);
+	void Initialize(WinApp*winApp);
 	//更新
 	void Update();
-/// <summary>
-/// キーの押下をチェック
-/// </summary>
-/// <param name="keyNumber">キー番号(DIK_0等)</param>
-/// <returns>押されているか</returns>
+
+	//任意のボタンんを押されている
 	bool PushKey(BYTE keyNumber);
-	/// <summary>
-/// キーのトリガーをチェック
-/// </summary>
-/// <param name="keyNumber">キー番号(DIK_0等)</param>
-/// <returns>トリガーか</returns>
+	//任意のボタンが押された瞬間
 	bool TriggerKey(BYTE keyNumber);
+	//任意のボタンが離された瞬間
 
 private:
-	ComPtr<IDirectInputDevice8> keyboard;
-	BYTE key[256] = {};
-	BYTE keyPre[256] = {};
-	ComPtr<IDirectInput8> directInput;
-	//WindowsAPI
 	WinApp* winApp_ = nullptr;
+
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput ;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard;
+	 BYTE key[256] = {};
+	 BYTE keyPre[256] = {};
 };
 

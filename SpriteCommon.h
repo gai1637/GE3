@@ -1,38 +1,42 @@
 #pragma once
-#include<wrl.h>
-#include<dxgi1_6.h>
-#include<d3d12.h>
-using namespace Microsoft::WRL;
+#include<Windows.h>
+#include <string>
+#include <wrl.h>
+#include<dxcapi.h>
 #include"DirectXCommon.h"
+#include <d3d12.h>
+
+#include<DirectXTex.h>
 
 class SpriteCommon
 {
-public:
-	void Initialize(DirectXCommon* dxCommon);
-	DirectXCommon* GetDxCommon()const { return dxCommon_; }
-	void SpritePreDraw();
-private:
-	//ルートシグネチャの生成
-	void CreateRootsignature();
-	//グラフィックスパイプライン
-	void CreatePaipline();
-	void CreateBlob();
-private:
-	 // ルートシグネチャ
-    ComPtr<ID3D12RootSignature> rootSignature;
-	 // ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParams[3] = {};
-	DirectXCommon* dxCommon_;
-	HRESULT result;
-	// グラフィックスパイプライン設定
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc{};
-	// パイプランステートの生成
-    ComPtr<ID3D12PipelineState> pipelineState;
-	 // デスクリプタレンジの設定
-    D3D12_DESCRIPTOR_RANGE descriptorRange{};
-	ComPtr<ID3DBlob> vsBlob = nullptr; // 頂点シェーダオブジェクト
-    ComPtr<ID3DBlob> psBlob = nullptr; // ピクセルシェーダオブジェクト
-    ComPtr<ID3DBlob> errorBlob = nullptr; // エラーオブジェクト
+	private:
+	template<class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+public:
+	void Initialize(DirectXCommon*dxCommon);
+	void SpritePreDraw();
+
+	ID3D12RootSignature* GetRootSignature() { return rootSignature.Get(); }
+	ID3D12PipelineState* GetPipelineState() { return pipelineState.Get(); }
+
+	DirectXCommon* GetDirectXCommon() { return dxCommon_; }
+
+
+private:
+ static	IDxcBlob* CompileShader(
+		const std::wstring& filePath,
+		const wchar_t*profile,
+		IDxcUtils*dxcUtils,
+		IDxcCompiler3*dxcCompiler,
+		IDxcIncludeHandler*includeHandler
+		);
+
+private:
+
+	DirectXCommon* dxCommon_ = nullptr;
+
+		ComPtr<ID3D12RootSignature>rootSignature;
+		ComPtr<ID3D12PipelineState>pipelineState;
 };
 

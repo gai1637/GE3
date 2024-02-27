@@ -1,93 +1,82 @@
 #pragma once
 #include<wrl.h>
-#include<dxgi1_6.h>
 #include<d3d12.h>
+#include<dxgi1_6.h>
 #include<vector>
-#include<chrono>
 #include"WinApp.h"
-#include<dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
-#include<string>
-#include <DirectXTex.h>
-#include<memory>
-#include<chrono>
-using namespace Microsoft::WRL;
+
 class DirectXCommon
 {
+private:
+	template<class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
+
 public:
-	
-	void Initialize(WinApp* winApp);
-    //•`‰æ‘Oˆ—
+	void Initialize(WinApp*winApp);
+
+	//æç”»
 	void PreDraw();
-	//•`‰æŒãˆ—
 	void PostDraw();
 
-    void ImGuiUpdate();
-
-    void EndImGui();
-
-	ID3D12Device*GetDevice()const { return device.Get(); }
+	//Getter
+	ID3D12Device* GetDevice()const { return device.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
-    //FPSŒÅ’è‰Šú‰»
-    void InitializeFixFPS();
-    //FPSŒÅ’èXV
-    void UpdateFixFPS();
 
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc(){return swapChainDesc; }
 
-   /* ComPtr<IDxcBlob> CompilShader(
-        const std::wstring& filePath,
-        const wchar_t* profile
-    );*/
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 
-    ComPtr<ID3D12Resource> CreateTexture(const DirectX::TexMetadata& metadata);
-    ID3D12DescriptorHeap* CreateDescriptorHeap(
-    ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-    
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap.Get(); }
+
 private:
-    //ƒfƒoƒCƒX
+	//ãƒ‡ãƒã‚¤ã‚¹
 	void DeviceInitialize();
-    //ƒRƒ}ƒ“ƒh
+	//ã‚³ãƒãƒ³ãƒ‰
 	void CommandInitialize();
-    //ƒXƒƒbƒvƒ`ƒF[ƒ“
+	//ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³
 	void SwapChainInitialize();
-    //[“xƒoƒbƒtƒ@
-	void DepthBufferInitialize();
-    //ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
+	//ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
 	void RenderTargetInitialize();
-    //ƒtƒFƒ“ƒX
+	//éœ‡åº¦ãƒãƒƒãƒ•ã‚¡
+	void DepthBufferInitialize();
+	//ãƒ•ã‚§ãƒ³ã‚¹
 	void FenceInitialize();
-    //ImGui
-    void ImGuiInitialize();
+
+	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescripots,bool shaderVisible);
+
+public:
+	static const uint32_t kMaxSRVCount;
+
 private:
-     // ƒfƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìİ’è
-    D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc{};
-    // [“xƒrƒ…[—pƒfƒXƒNƒŠƒvƒ^ƒq[ƒvì¬
-    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
-    ComPtr<ID3D12DescriptorHeap> dsvHeap;
-    // ƒoƒbƒNƒoƒbƒtƒ@
-    std::vector<ComPtr<ID3D12Resource>> backBuffers;
-	D3D12_RESOURCE_BARRIER barrierDesc{};
-    // ƒtƒFƒ“ƒX‚Ì¶¬
-    ComPtr<ID3D12Fence> fence;
-    UINT64 fenceVal = 0;
-    // ƒŠƒ\[ƒX¶¬
-    ComPtr<ID3D12Resource> depthBuff;
-    // ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚Ìİ’è
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	WinApp* winApp = nullptr;
 
-    ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
+	ComPtr<ID3D12Device> device;
+	ComPtr<IDXGIFactory7>dxgiFactory;
 
-    ComPtr<ID3D12Device> device;
-    ComPtr<IDXGIFactory7> dxgiFactory;
-    ComPtr<IDXGISwapChain4> swapChain;
-    DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-    ComPtr<ID3D12CommandAllocator> commandAllocator;
-    ComPtr<ID3D12GraphicsCommandList> commandList;
-    ComPtr<ID3D12CommandQueue> commandQueue;
-    ComPtr<ID3D12DescriptorHeap> rtvHeap;
+	ComPtr<ID3D12CommandAllocator>commandAllocator;
+    ComPtr<ID3D12GraphicsCommandList>commandList;
+    ComPtr<ID3D12CommandQueue>commandQueue;
 
-   
-    WinApp* winApp_ = nullptr;
-    std::chrono::steady_clock::time_point reference_;
+   DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	ComPtr<IDXGISwapChain4> swapChain;
+
+	 D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc{};
+	ComPtr<ID3D12DescriptorHeap>rtvHeap;
+	 std::vector<ComPtr<ID3D12Resource>>backBuffers;
+
+	  ComPtr<ID3D12Resource>depthBuff;
+	  D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
+	   ComPtr<ID3D12DescriptorHeap>dsvHeap;
+
+	   ComPtr<ID3D12Fence>fence;
+	   UINT64 fenceVal = 0;
+
+	   D3D12_RESOURCE_BARRIER barrierDesc{};
+
+	     // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®è¨­å®š
+        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+
+	   ComPtr<ID3D12DescriptorHeap>rtvDesctiptorHeap;
+
+	   ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
 };
 
